@@ -1,0 +1,28 @@
+2026-04-21 08:00:00 [INFO] Service started on port 8080
+2026-04-21 08:00:02 [INFO] Database connection established
+2026-04-21 08:05:11 [WARNING] Cache miss ratio above 40%
+2026-04-21 08:22:10 [ERROR] Timeout while calling payment-service
+2026-04-21 08:22:14 [ERROR] Timeout while calling payment-service
+2026-04-21 08:22:19 [WARN] Payment retry queue growing (size=12)
+2026-04-21 09:10:05 [INFO] User 3021 logged in
+2026-04-21 09:11:48 [ERROR] Null reference exception in OrderController.Process
+2026-04-21 10:00:00 [INFO] Health check OK
+2026-04-21 10:34:02 [ERROR] Connection refused by upstream service auth-svc
+2026-04-21 10:34:07 [ERROR] Connection refused by upstream service auth-svc
+2026-04-21 10:34:12 [ERROR] Connection refused by upstream service auth-svc
+2026-04-21 10:34:20 [FATAL] Unable to reach auth-svc after 5 retries, failing over
+2026-04-21 10:34:22 [INFO] Failover to auth-svc-backup succeeded
+2026-04-21 11:42:58 [WARNING] Slow query detected (1.6s) on orders table
+2026-04-21 12:00:00 [INFO] Health check OK
+2026-04-21 13:17:42 [INFO] User 3021 logged out
+2026-04-21 13:18:01 [ERROR] Null reference exception in OrderController.Process
+2026-04-21 14:00:00 [INFO] Health check OK
+2026-04-21 15:55:33 [WARNING] Deprecated API endpoint /v1/users called by client 10.0.2.14
+2026-04-21 16:20:14 [ERROR] Timeout while calling payment-service
+2026-04-21 17:00:00 [INFO] Backup started
+2026-04-21 17:02:02 [INFO] Backup completed successfully
+2026-04-21 18:10:09 [ERROR] Connection refused by upstream service auth-svc
+2026-04-21 19:30:44 [WARNING] Disk usage at 86% on /var
+2026-04-21 20:01:11 [INFO] Health check OK
+2026-04-21 22:00:00 [INFO] Daily metrics snapshot saved
+2026-04-21 23:59:59 [INFO] End of day

@@ -37,6 +37,30 @@ param(
 
 # ---------- Functions ----------
 
+function Test-LogFolder {
+    param([Parameter(Mandatory)][string]$Path)
+
+    if (-not (Test-Path $Path)) {
+        Write-Host "ERROR: Log folder does not exist: $Path" -ForegroundColor Red
+        Write-Host "       Check the -LogFolder parameter and try again." -ForegroundColor Red
+        return $false
+    }
+
+    $item = Get-Item -Path $Path
+    if (-not $item.PSIsContainer) {
+        Write-Host "ERROR: -LogFolder must be a directory, but got a file: $Path" -ForegroundColor Red
+        return $false
+    }
+
+    $childCount = @(Get-ChildItem -Path $Path -File -Force -ErrorAction SilentlyContinue).Count
+    if ($childCount -eq 0) {
+        Write-Host "ERROR: Log folder is empty: $Path" -ForegroundColor Red
+        return $false
+    }
+
+    return $true
+}
+
 function Get-LogFiles {
     # Pipeline usage: Get-ChildItem piped into Where-Object
     param([Parameter(Mandatory)][string]$Path)
@@ -196,9 +220,8 @@ th { background: #2c3e50; color: #fff; }
 Write-Host "Log File Analyzer" -ForegroundColor Cyan
 Write-Host "-----------------"
 
-if (-not (Test-Path $LogFolder)) {
-    Write-Error "Log folder not found: $LogFolder"
-    exit 1
+if (-not (Test-LogFolder -Path $LogFolder)) {
+    exit 2
 }
 
 if (-not (Test-Path $OutputFolder)) {

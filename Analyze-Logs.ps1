@@ -69,7 +69,7 @@ function Get-LogFiles {
         Where-Object { $_.Extension -in '.log', '.txt' }
 }
 
-function Parse-LogLine {
+function Convert-LogLine {
     <#
         Regex captures three named groups:
           timestamp : yyyy-MM-dd HH:mm:ss  (or with 'T')
@@ -107,7 +107,7 @@ function Get-LogEntries {
 
         foreach ($line in Get-Content -Path $file.FullName) {
             $lineNumber++
-            $entry = Parse-LogLine -Line $line
+            $entry = Convert-LogLine -Line $line
             if ($entry) {
                 $fileEntries++
                 Write-Output ($entry | Add-Member -NotePropertyName SourceFile -NotePropertyValue $file.Name -PassThru)

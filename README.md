@@ -131,5 +131,5 @@ severity levels and top error patterns.
 
 | Name | GitHub | Contribution |
 |---|---|---|
-| Derrick | @your-handle | _fill in_ |
-| Teammate | @their-handle | _fill in_ |
+| Derrick |
+| Nick | 

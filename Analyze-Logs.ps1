@@ -94,15 +94,23 @@ function Parse-LogLine {
 }
 
 function Get-LogEntries {
-    param([Parameter(Mandatory)][System.IO.FileInfo[]]$Files)
+    param(
+        [Parameter(Mandatory)][System.IO.FileInfo[]]$Files,
+        [string]$SkippedLinesPath
+    )
 
     foreach ($file in $Files) {
-        Get-Content -Path $file.FullName |
-            ForEach-Object { Parse-LogLine -Line $_ } |
-            Where-Object   { $_ -ne $null } |
-            ForEach-Object {
-                $_ | Add-Member -NotePropertyName SourceFile -NotePropertyValue $file.Name -PassThru
+        $lineNumber = 0
+        foreach ($line in Get-Content -Path $file.FullName) {
+            $lineNumber++
+            $entry = Parse-LogLine -Line $line
+            if ($entry) {
+                Write-Output ($entry | Add-Member -NotePropertyName SourceFile -NotePropertyValue $file.Name -PassThru)
             }
+            elseif ($SkippedLinesPath -and $line.Trim()) {
+                "$($file.Name):${lineNumber}: $line" | Add-Content -Path $SkippedLinesPath
+            }
+        }
     }
 }
 
@@ -236,7 +244,14 @@ if (-not $files -or $files.Count -eq 0) {
 
 Write-Host "Found $($files.Count) file(s) in $LogFolder. Parsing..." -ForegroundColor Cyan
 
-$entries = @(Get-LogEntries -Files $files)
+$skippedPath = Join-Path $OutputFolder 'skipped-lines.txt'
+if (Test-Path $skippedPath) { Remove-Item $skippedPath }
+$entries = @(Get-LogEntries -Files $files -SkippedLinesPath $skippedPath)
+
+if (Test-Path $skippedPath) {
+    $skippedCount = @(Get-Content $skippedPath).Count
+    Write-Host "Skipped $skippedCount unparseable line(s). See: $skippedPath" -ForegroundColor Yellow
+}
 
 if ($entries.Count -eq 0) {
     Write-Warning "No parseable log entries found."

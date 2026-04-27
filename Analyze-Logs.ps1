@@ -100,19 +100,31 @@ function Get-LogEntries {
     )
 
     foreach ($file in $Files) {
-        $lineNumber = 0
+        Write-Verbose "Parsing $($file.Name)..."
+        $fileEntries = 0
+        $fileSkipped = 0
+        $lineNumber  = 0
+
         foreach ($line in Get-Content -Path $file.FullName) {
             $lineNumber++
             $entry = Parse-LogLine -Line $line
             if ($entry) {
+                $fileEntries++
                 Write-Output ($entry | Add-Member -NotePropertyName SourceFile -NotePropertyValue $file.Name -PassThru)
             }
             elseif ($SkippedLinesPath -and $line.Trim()) {
+                $fileSkipped++
                 "$($file.Name):${lineNumber}: $line" | Add-Content -Path $SkippedLinesPath
             }
         }
+
+        Write-Verbose "  -> $fileEntries parsed, $fileSkipped skipped"
     }
 }
+
+Write-Verbose "LogFolder:    $LogFolder"
+Write-Verbose "OutputFolder: $OutputFolder"
+Write-Verbose "TopN:         $TopN"
 
 function Get-LevelSummary {
     param([Parameter(Mandatory)]$Entries)

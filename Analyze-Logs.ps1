@@ -69,7 +69,7 @@ function Get-LogFiles {
         Where-Object { $_.Extension -in '.log', '.txt' }
 }
 
-function Parse-LogLine {
+function Convert-LogLine {
     <#
         Regex captures three named groups:
           timestamp : yyyy-MM-dd HH:mm:ss  (or with 'T')
@@ -305,7 +305,7 @@ $entries | Export-Csv -Path $csvAll     -NoTypeInformation -Encoding UTF8
 # Write HTML
 $htmlPath = Join-Path $OutputFolder 'report.html'
 Export-HtmlReport `
-    -PerFile $perFile
+    -PerFile      $perFile `
     -Summary      $summary `
     -TopErrors    $topErrors `
     -Path         $htmlPath `

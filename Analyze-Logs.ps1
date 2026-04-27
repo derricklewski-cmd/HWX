@@ -201,6 +201,20 @@ function Export-HtmlReport {
           "<tr><td>$(HtmlEncode $f.SourceFile)</td><td>$($f.Total)</td><td class='error'>$($f.Errors)</td><td class='warn'>$($f.Warnings)</td><td class='info'>$($f.Info)</td><td class='error'>$($f.Fatal)</td></tr>"
     }
 
+    $maxCount = ($Summary | Measure-Object -Property Count -Maximum).Maximum
+    if (-not $maxCount) { $maxCount = 1 }
+
+    $bars = foreach ($row in $Summary) {
+        $pct = [math]::Round(($row.Count / $maxCount) * 100)
+        $cls = switch ($row.Level) {
+            'ERROR'   { 'bar-error' }
+            'FATAL'   { 'bar-error' }
+            'WARNING' { 'bar-warn'  }
+            default   { 'bar-info'  }
+        }
+        "<div class='bar-row'><span class='bar-label'>$($row.Level)</span><div class='bar $cls' style='width: $pct%'>$($row.Count)</div></div>"
+ } 
+
     $html = @"
 <!DOCTYPE html>
 <html>
@@ -219,6 +233,13 @@ th { background: #2c3e50; color: #fff; }
 .info  { color: #27ae60; }
 .summary-box { background: #f4f6f8; border-left: 4px solid #2c3e50; padding: 12px 16px; }
 .small { color: #666; font-size: 0.9em; }
+.bars { max-width: 600px; margin: 10px 0; }
+.bar-row { display: flex; align-items: center; margin: 4px 0; }
+.bar-label { width: 90px; font-weight: bold; }
+.bar { color: white; padding: 5px 10px; border-radius: 3px; min-width: 30px; }
+.bar-info  { background: #27ae60; }
+.bar-warn  { background: #e67e22; }
+.bar-error { background: #c0392b; }
 </style>
 </head>
 <body>

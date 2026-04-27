@@ -37,6 +37,30 @@ param(
 
 # ---------- Functions ----------
 
+function Test-LogFolder {
+    param([Parameter(Mandatory)][string]$Path)
+
+    if (-not (Test-Path $Path)) {
+        Write-Host "ERROR: Log folder does not exist: $Path" -ForegroundColor Red
+        Write-Host "       Check the -LogFolder parameter and try again." -ForegroundColor Red
+        return $false
+    }
+
+    $item = Get-Item -Path $Path
+    if (-not $item.PSIsContainer) {
+        Write-Host "ERROR: -LogFolder must be a directory, but got a file: $Path" -ForegroundColor Red
+        return $false
+    }
+
+    $childCount = @(Get-ChildItem -Path $Path -File -Force -ErrorAction SilentlyContinue).Count
+    if ($childCount -eq 0) {
+        Write-Host "ERROR: Log folder is empty: $Path" -ForegroundColor Red
+        return $false
+    }
+
+    return $true
+}
+
 function Get-LogFiles {
     # Pipeline usage: Get-ChildItem piped into Where-Object
     param([Parameter(Mandatory)][string]$Path)
@@ -70,15 +94,23 @@ function Parse-LogLine {
 }
 
 function Get-LogEntries {
-    param([Parameter(Mandatory)][System.IO.FileInfo[]]$Files)
+    param(
+        [Parameter(Mandatory)][System.IO.FileInfo[]]$Files,
+        [string]$SkippedLinesPath
+    )
 
     foreach ($file in $Files) {
-        Get-Content -Path $file.FullName |
-            ForEach-Object { Parse-LogLine -Line $_ } |
-            Where-Object   { $_ -ne $null } |
-            ForEach-Object {
-                $_ | Add-Member -NotePropertyName SourceFile -NotePropertyValue $file.Name -PassThru
+        $lineNumber = 0
+        foreach ($line in Get-Content -Path $file.FullName) {
+            $lineNumber++
+            $entry = Parse-LogLine -Line $line
+            if ($entry) {
+                Write-Output ($entry | Add-Member -NotePropertyName SourceFile -NotePropertyValue $file.Name -PassThru)
             }
+            elseif ($SkippedLinesPath -and $line.Trim()) {
+                "$($file.Name):${lineNumber}: $line" | Add-Content -Path $SkippedLinesPath
+            }
+        }
     }
 }
 
@@ -196,9 +228,8 @@ th { background: #2c3e50; color: #fff; }
 Write-Host "Log File Analyzer" -ForegroundColor Cyan
 Write-Host "-----------------"
 
-if (-not (Test-Path $LogFolder)) {
-    Write-Error "Log folder not found: $LogFolder"
-    exit 1
+if (-not (Test-LogFolder -Path $LogFolder)) {
+    exit 2
 }
 
 if (-not (Test-Path $OutputFolder)) {
@@ -213,7 +244,14 @@ if (-not $files -or $files.Count -eq 0) {
 
 Write-Host "Found $($files.Count) file(s) in $LogFolder. Parsing..." -ForegroundColor Cyan
 
-$entries = @(Get-LogEntries -Files $files)
+$skippedPath = Join-Path $OutputFolder 'skipped-lines.txt'
+if (Test-Path $skippedPath) { Remove-Item $skippedPath }
+$entries = @(Get-LogEntries -Files $files -SkippedLinesPath $skippedPath)
+
+if (Test-Path $skippedPath) {
+    $skippedCount = @(Get-Content $skippedPath).Count
+    Write-Host "Skipped $skippedCount unparseable line(s). See: $skippedPath" -ForegroundColor Yellow
+}
 
 if ($entries.Count -eq 0) {
     Write-Warning "No parseable log entries found."

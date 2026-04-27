@@ -1,4 +1,4 @@
-"Timestamp","Level","Message","SourceFile"
+﻿"Timestamp","Level","Message","SourceFile"
 "2026-04-20 08:00:01","INFO","Service started on port 8080","app-2026-04-20.log"
 "2026-04-20 08:00:02","INFO","Loaded configuration from /etc/app/config.yml","app-2026-04-20.log"
 "2026-04-20 08:00:03","INFO","Database connection established","app-2026-04-20.log"

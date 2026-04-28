@@ -129,6 +129,9 @@ severity levels and top error patterns.
 
 ## Team
 
+| Derrick Lewski | @derricklewski-cmd | Wrote analyzer script: Test-LogFolder validation, skipped-lines logging, -Verbose progress output | | Nick (full name) | @NicholasK1800 | Improved HTML 
+report: per-file breakdown table, CSS bar chart for level counts |
+
 | Name | GitHub | Contribution |
 | Derrick | derricklewski-cmd | 5 substansive commits and two merges
-| Nick | NicholasK1800 | technically 2 commits but 1 commit has content of 2 and a merge
+| Nicholas | NicholasK1800 | technically 2 commits but 1 commit has content of 2 and a merge

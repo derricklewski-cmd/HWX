@@ -130,6 +130,5 @@ severity levels and top error patterns.
 ## Team
 
 | Name | GitHub | Contribution |
-|---|---|---|
-| Derrick |
-| Nick | 
+| Derrick | derricklewski-cmd | 5 substansive commits and two merges
+| Nick | NicholasK1800 | technically 2 commits but 1 commit has content of 2 and a merge
